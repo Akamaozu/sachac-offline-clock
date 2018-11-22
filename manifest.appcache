@@ -1,0 +1,8 @@
+CACHE MANIFEST
+# Time: 2018-11-22 4:32am GMT-5
+
+CACHE:
+index.html
+
+FALLBACK:
+/ index.html
