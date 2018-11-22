@@ -1,0 +1,175 @@
+<html>
+<head>
+  <!-- Based on https://bl.ocks.org/vasturiano/118e167e9bc93356221f67905c87cd6f , Vasco Asturiano, MIT License -->
+  <meta name="viewport" content="width=device-width">
+  <script src="/cdn-cgi/apps/head/4FYHpufmnIObdfBGZcvuzQtF5_k.js"></script><script src="http://cdnjs.cloudflare.com/ajax/libs/d3/4.6.0/d3.min.js"></script>
+  <script src="http://unpkg.com/d3-radial-axis@1.5/dist/d3-radial-axis.min.js"></script>
+  <style type="text/css">
+   body {
+       text-align: center;
+       font-family: Sans-serif;
+       margin: 0;
+   }
+
+   .background {
+       stroke-width: 0;
+       fill: Lavender;
+       fill-opacity: 0.3;
+   }
+
+   .axis .domain, .axis .tick line {
+       stroke-width: 2px;
+       stroke: DarkSlateGrey;
+   }
+
+   .axis .tick:first-of-type {
+       display: none; // hide 0 tick
+   }
+
+   .minor-ticks text, .minor-ticks path {
+       display: none;  // Hide all but ticks
+   }
+
+   .pointers rect {
+       fill-opacity: 0.5;
+   }
+
+   .pointers .hour {
+       fill: green;
+   }
+
+   .pointers .min {
+       fill: blue;
+   }
+   
+   .pointers .sec {
+       fill: red;
+   }
+
+   .pointers .center {
+       fill: darkgrey;
+   }
+
+   .hour-circle {
+       fill: none;
+       stroke: green;
+       stroke-opacity: 0.5;
+   }
+  </style>
+</head>
+
+<body>
+  <svg id="canvas"></svg>
+  <p><button id="toggle-hands" onclick="toggleHands()">Toggle hands</button></p>
+  <script type="text/javascript">
+    d3.selection.prototype.toggle = function() {  
+      var isHidden = this.style('display') == 'none';
+      return this.style('display', isHidden ? 'inherit' : 'none');
+    }
+    function toggleHands() {
+      d3.select('g.pointers').toggle()
+    }
+    
+   const r = Math.min(window.innerWidth, window.innerHeight) / 2,
+         secMinScale = d3.scaleLinear().domain([0, 60]).range([0, 360]),
+         hourScale = d3.scaleLinear().domain([0, 12]).range([0, 360])
+
+     const pointersRelDimensions = [
+       { class: 'hour', width: 0.05, height: 0.7 }, //,
+       { class: 'min', width: 0.05, height: 1 }
+//       { class: 'sec', width: 0.02, height: 0.85 }
+     ]
+
+   // Size canvas
+   const svg = d3.select('#canvas')
+                 .attr('width', window.innerWidth)
+                 .attr('height', window.innerHeight)
+                 .attr('viewBox', `${-r} ${-r} ${r*2} ${r*2}`)
+
+     // Add background
+     svg.append('circle').classed('background', true)
+                 .attr('cx', 0)
+                 .attr('cy', 0)
+                 .attr('r', r)
+
+     // Add axis
+     svg.append('g').classed('axis', true)
+                 .call(d3.axisRadialInner(
+                   hourScale.copy().range([0, 2 * Math.PI]),
+                   r - 1
+                 )
+                         .ticks(12)
+                     .tickSize(15)
+                     .tickPadding(r * 0.15)
+                     
+                 )
+
+     
+     svg.append('g').classed('minor-ticks', true)
+                 .call(d3.axisRadialInner(
+                   secMinScale.copy().range([0, 2 * Math.PI]),
+                   r - 1
+                 )
+                         .ticks(60)
+                         .tickSize(6)
+                 )
+
+     // Add pointers
+     svg.append('g').classed('pointers', true)
+                 .attr('transform', `scale(${r})`)
+                 .selectAll('rect')
+                 .data(pointersRelDimensions)
+                 .enter()
+                 .append('rect')
+                 .attr('class', d=> d.class)
+                 .attr('x', d => -d.width/2)
+                 .attr('y', d => -d.height + d.width/2)
+                 .attr('width', d => d.width)
+                 .attr('height', d => d.height)
+                 .attr('rx', 0.02)
+                 .attr('ry', 0.03)
+     svg.select('.pointers').append('circle').classed('hour-circle', true)
+                 .attr('r', 0.15)
+                 .attr('cx', 0)
+                 .attr('cy', -0.8)
+                 .attr('stroke-width', 0.05)
+     svg.selectAll('.axis text').style('font-size', Math.floor(r / 5) + 'px')
+     // Add center
+     svg.select('.pointers')
+                 .append('circle').classed('center', true)
+                 .attr('cx', 0)
+                 .attr('cy', 0)
+                 .attr('r', 0.02)
+
+ 
+     // Kick-off clock
+
+     framed()
+
+     function framed() {
+       const dt = new Date()
+
+         const ms = dt.getMilliseconds(),
+               secs = dt.getSeconds() + ms/1000,
+               mins = dt.getMinutes() + secs/60,
+               hours = dt.getHours()%12 + mins/60
+
+       d3.select('.pointers .hour').attr('transform', `rotate(${hourScale(hours)})`)
+         d3.select('.pointers .min').attr('transform', `rotate(${secMinScale(mins)})`)
+//         d3.select('.pointers .sec').attr('transform', `rotate(${secMinScale(secs)})`)
+         d3.select('.pointers .hour-circle').attr('transform', `rotate(${hourScale(hours)})`)
+        window.setTimeout(function() { requestAnimationFrame(framed) }, 1000)
+     }
+
+  </script>
+
+  
+  <p>Coded by Sacha Chua based on code &copy; <a href="https://bl.ocks.org/vasturiano/118e167e9bc93356221f67905c87cd6f">Vasco Asturiano</a> (2017), which is released under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+</body>
+</html>
