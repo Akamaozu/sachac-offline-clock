@@ -113,6 +113,27 @@
     !function(t,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports):"function"==typeof define&&define.amd?define(["exports"],n):n(t.d3=t.d3||{})}(this,function(t){"use strict";function n(t){return t}function r(t,n){return"translate("+t+","+n+")"}function e(t){var n=t.bandwidth()/2;return t.round()&&(n=Math.round(n)),function(r){return t(r)+n}}function i(){return!this.__axis}function a(t,a,o){function c(t){return r.apply(r,u(t))}function u(t,n){return n=void 0===n?a:n,[Math.sin(t)*n,-Math.cos(t)*n]}function l(r){var l=null==f?t.ticks?t.ticks.apply(t,s):t.domain():f,y=null==d?t.tickFormat?t.tickFormat.apply(t,s):n:d,g=Math.max(p,0)+m,k=t.range(),x=(t.bandwidth?e:n)(t.copy()),M=r.selection?r.selection():r,A=M.selectAll(".domain").data([null]),j=M.selectAll(".tick").data(l,t).order(),_=j.exit(),b=j.enter().append("g").attr("class","tick"),v=j.select("line"),I=j.select("text");A=A.merge(A.enter().insert("path",".tick").attr("class","domain").attr("stroke","#000")),j=j.merge(b),v=v.merge(b.append("line").attr("stroke","#000")),I=I.merge(b.append("text").attr("fill","#000").attr("dy",".35em").attr("text-anchor","middle")),r!==M&&(A=A.transition(r),j=j.transition(r),v=v.transition(r),I=I.transition(r),_=_.transition(r).attr("opacity",0).attr("transform",function(t){return isFinite(t=x(t))?c(t):this.getAttribute("transform")}),b.attr("opacity",0).attr("transform",function(t){var n=this.parentNode.__axis;return c(n&&isFinite(n=n(t))?n:x(t))})),_.remove(),A.attr("d","M"+u(k[0],a+h*(o?1:-1)).join(",")+"L"+u(k[0]).join(",")+(Math.abs(k[1]-k[0])>=2*Math.PI?"A"+[a,a,0,1,1].concat(u(k[0]+Math.PI)).join(",")+"A"+[a,a,0,1,1].concat(u(k[0])).join(","):"")+"A"+[a,a,0,Math.abs(k[1]-k[0])%(2*Math.PI)>Math.PI?1:0,k[1]>k[0]?1:0].concat(u(k[1])).join(",")+"L"+u(k[1],a+h*(o?1:-1)).join(",")),j.attr("opacity",1).attr("transform",function(t){return c(x(t))}),v.attr("x1",0).attr("y1",0).attr("x2",function(t){return u(x(t),p)[0]*(o?1:-1)}).attr("y2",function(t){return u(x(t),p)[1]*(o?1:-1)}),I.attr("x",function(t){return u(x(t),g)[0]*(o?1:-1)}).attr("y",function(t){return u(x(t),g)[1]*(o?1:-1)}).text(y),M.filter(i).attr("fill","none").attr("font-size",10).attr("font-family","sans-serif"),M.each(function(){this.__axis=x})}var s=[],f=null,d=null,p=6,h=6,m=12;return l.scale=function(n){return arguments.length?(t=n,l):t},l.ticks=function(){return s=Array.prototype.slice.call(arguments),l},l.tickArguments=function(t){return arguments.length?(s=null==t?[]:Array.prototype.slice.call(t),l):s.slice()},l.tickValues=function(t){return arguments.length?(f=null==t?null:Array.prototype.slice.call(t),l):f&&f.slice()},l.tickFormat=function(t){return arguments.length?(d=t,l):d},l.tickSize=function(t){return arguments.length?(p=h=+t,l):p},l.tickSizeInner=function(t){return arguments.length?(p=+t,l):p},l.tickSizeOuter=function(t){return arguments.length?(h=+t,l):h},l.tickPadding=function(t){return arguments.length?(m=+t,l):m},l}function o(t,n){return a(t,n,!1)}function c(t,n){return a(t,n,!0)}t.axisRadialInner=o,t.axisRadialOuter=c,Object.defineProperty(t,"__esModule",{value:!0})});
   </script>
   <script type="text/javascript">
+    // appcache behavior
+
+    if( window.applicationCache ){
+      window.applicationCache.addEventListener('downloading', cacheDownloading);
+      window.applicationCache.addEventListener('updateready', cacheReady);
+    }
+
+    // new appcache ready
+      function cacheReady(){
+        alert('App Has Been Updated and will Restart Now');
+
+        window.applicationCache.swapCache();
+        location.reload(true);
+      }
+
+    // new appcache downloading
+      function cacheDownloading(){
+        alert("Downloading App Updates - Sorry for the Wait");
+      }
+  </script>
+  <script type="text/javascript">
     d3.selection.prototype.toggle = function() {  
       var isHidden = this.style('display') == 'none';
       return this.style('display', isHidden ? 'inherit' : 'none');
